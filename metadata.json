@@ -1,0 +1,6 @@
+{
+  "name": "Lost & Found Bangladesh | হারানো ও প্রাপ্তি বাংলাদেশ",
+  "description": "A secure, privacy-first bilingual lost and found platform for Bangladesh. Report lost and found items, submit private claims, and safely reconnect with belongings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

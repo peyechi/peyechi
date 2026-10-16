@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ShieldCheck, Lock, Send, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface ClaimModalProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({
     setLoading(true);
 
     try {
-      const res = await fetch('/api/claims', {
+      await apiFetch('/api/claims', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,11 +68,6 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({
           contact_info: contactInfo,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit claim');
-      }
 
       onSuccess();
       onClose();

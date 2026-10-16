@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, AlertOctagon, Send, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface ReportPostModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const ReportPostModal: React.FC<ReportPostModalProps> = ({
     setError(null);
 
     try {
-      const res = await fetch('/api/reports', {
+      await apiFetch('/api/reports', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,11 +46,6 @@ export const ReportPostModal: React.FC<ReportPostModalProps> = ({
           description,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit report');
-      }
 
       setSuccess(true);
       setTimeout(() => {

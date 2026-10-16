@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface AdminDashboardProps {
   onNavigate: (page: string, params?: any) => void;
@@ -49,10 +50,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const isAdmin = user && (user.role === 'ADMIN' || user.role === 'MODERATOR');
 
   const fetchMetrics = () => {
-    fetch('/api/admin/metrics', {
+    apiFetch('/api/admin/metrics', {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
       .then((data) => setMetrics(data.stats))
       .catch((e) => console.error(e));
   };
@@ -63,50 +63,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
     setError(null);
 
     if (activeTab === 'overview' || activeTab === 'pending') {
-      fetch('/api/admin/posts?status=PENDING', {
+      apiFetch('/api/admin/posts?status=PENDING', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setPosts(data.posts || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     } else if (activeTab === 'posts') {
-      fetch('/api/admin/posts?status=ALL', {
+      apiFetch('/api/admin/posts?status=ALL', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setPosts(data.posts || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     } else if (activeTab === 'claims') {
-      fetch('/api/admin/claims', {
+      apiFetch('/api/admin/claims', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setClaims(data.claims || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     } else if (activeTab === 'reports') {
-      fetch('/api/admin/reports', {
+      apiFetch('/api/admin/reports', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setReports(data.reports || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     } else if (activeTab === 'users') {
-      fetch('/api/admin/users', {
+      apiFetch('/api/admin/users', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setUsersList(data.users || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     } else if (activeTab === 'logs') {
-      fetch('/api/admin/logs', {
+      apiFetch('/api/admin/logs', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
         .then((data) => setLogs(data.logs || []))
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
@@ -122,7 +116,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   const handleModeratePost = async (postId: string, action: 'APPROVE' | 'REJECT', reason?: string) => {
     try {
-      const res = await fetch(`/api/admin/posts/${postId}/moderate`, {
+      await apiFetch(`/api/admin/posts/${postId}/moderate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,10 +124,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         },
         body: JSON.stringify({ action, reason }),
       });
-      if (res.ok) {
-        setRejectModalItem(null);
-        fetchTabData();
-      }
+      setRejectModalItem(null);
+      fetchTabData();
     } catch (e) {
       console.error(e);
     }
@@ -141,7 +133,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   const handleToggleUserStatus = async (userId: string) => {
     try {
-      const res = await fetch(`/api/admin/users/${userId}/toggle-status`, {
+      await apiFetch(`/api/admin/users/${userId}/toggle-status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,9 +141,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         },
         body: JSON.stringify({ reason: 'Admin toggle status' }),
       });
-      if (res.ok) {
-        fetchTabData();
-      }
+      fetchTabData();
     } catch (e) {
       console.error(e);
     }
@@ -159,7 +149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   const handleResolveReport = async (reportId: string, status: string) => {
     try {
-      const res = await fetch(`/api/admin/reports/${reportId}/resolve`, {
+      await apiFetch(`/api/admin/reports/${reportId}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,9 +157,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         },
         body: JSON.stringify({ status, admin_notes: 'Reviewed by moderator' }),
       });
-      if (res.ok) {
-        fetchTabData();
-      }
+      fetchTabData();
     } catch (e) {
       console.error(e);
     }

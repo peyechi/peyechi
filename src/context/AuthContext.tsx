@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiFetch } from '../lib/apiClient.ts';
 
 export interface User {
   id: string;
@@ -29,19 +30,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchCurrentUser = async (authToken: string) => {
     try {
-      const res = await fetch('/api/auth/me', {
+      const data = await apiFetch('/api/auth/me', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        localStorage.removeItem('lf_token');
-        setToken(null);
-        setUser(null);
-      }
+      setUser(data.user);
     } catch (err) {
       console.error('Failed to authenticate token:', err);
       setUser(null);
@@ -60,27 +54,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const data = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Login failed' };
-      }
       localStorage.setItem('lf_token', data.token);
       setToken(data.token);
       setUser(data.user);
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'Network error' };
+      return { success: false, error: err.message || 'Login failed' };
     }
   };
 
   const register = async (email: string, password: string, displayName: string, lang = 'bn') => {
     try {
-      const res = await fetch('/api/auth/register', {
+      const data = await apiFetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -90,23 +80,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           preferred_language: lang,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Registration failed' };
-      }
       localStorage.setItem('lf_token', data.token);
       setToken(data.token);
       setUser(data.user);
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'Network error' };
+      return { success: false, error: err.message || 'Registration failed' };
     }
   };
 
   const logout = async () => {
     if (token) {
       try {
-        await fetch('/api/auth/logout', {
+        await apiFetch('/api/auth/logout', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
         });

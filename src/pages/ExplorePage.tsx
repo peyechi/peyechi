@@ -11,6 +11,7 @@ import {
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { CATEGORIES, DIVISIONS, DISTRICTS } from '../data/bangladeshData.ts';
 import { ItemCard, ItemCardData } from '../components/ItemCard.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface ExplorePageProps {
   initialFilters?: {
@@ -86,8 +87,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ initialFilters, onNavi
     params.set('page', page.toString());
     params.set('limit', '12');
 
-    fetch(`/api/posts?${params.toString()}`)
-      .then((res) => res.json())
+    apiFetch(`/api/posts?${params.toString()}`)
       .then((data) => {
         setPosts(data.posts || []);
         setTotalPages(data.totalPages || 1);

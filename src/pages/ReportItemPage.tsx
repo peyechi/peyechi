@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { CATEGORIES, DIVISIONS, DISTRICTS } from '../data/bangladeshData.ts';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface ReportItemPageProps {
   defaultType?: 'LOST' | 'FOUND';
@@ -142,7 +143,7 @@ export const ReportItemPage: React.FC<ReportItemPageProps> = ({
         images: imagePreview ? [{ storage_path: imagePreview }] : [],
       };
 
-      const res = await fetch('/api/posts', {
+      const data = await apiFetch('/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,11 +151,6 @@ export const ReportItemPage: React.FC<ReportItemPageProps> = ({
         },
         body: JSON.stringify(payload),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit post');
-      }
 
       setSubmittedPostId(data.post.id);
     } catch (err: any) {

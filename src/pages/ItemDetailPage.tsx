@@ -23,6 +23,7 @@ import { CategoryIcon } from '../components/CategoryIcon.tsx';
 import { AntiScamNotice } from '../components/AntiScamNotice.tsx';
 import { ClaimModal } from '../components/ClaimModal.tsx';
 import { ReportPostModal } from '../components/ReportPostModal.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface ItemDetailPageProps {
   id: string;
@@ -49,13 +50,9 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
 
   const fetchPostDetails = () => {
     setLoading(true);
-    fetch(`/api/posts/${id}`, {
+    apiFetch(`/api/posts/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then((res) => {
-        if (!res.ok) throw new Error('Listing not found or access restricted.');
-        return res.json();
-      })
       .then((data) => {
         setPost(data.post);
       })
@@ -68,13 +65,9 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
   const fetchClaimsForOwner = () => {
     if (!token || !id) return;
     setClaimsLoading(true);
-    fetch(`/api/posts/${id}/claims`, {
+    apiFetch(`/api/posts/${id}/claims`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return { claims: [] };
-      })
       .then((data) => {
         setClaims(data.claims || []);
       })
@@ -104,7 +97,7 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
   const handleResolvePost = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`/api/posts/${id}/resolve`, {
+      await apiFetch(`/api/posts/${id}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,9 +105,7 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
         },
         body: JSON.stringify({ reason: 'Marked resolved by finder/owner' }),
       });
-      if (res.ok) {
-        fetchPostDetails();
-      }
+      fetchPostDetails();
     } catch (e) {
       console.error(e);
     }
@@ -126,13 +117,11 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
       return;
     }
     try {
-      const res = await fetch(`/api/posts/${id}`, {
+      await apiFetch(`/api/posts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        onNavigate('explore');
-      }
+      onNavigate('explore');
     } catch (e) {
       console.error(e);
     }
@@ -141,7 +130,7 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
   const handleClaimStatusUpdate = async (claimId: string, newStatus: string, notes?: string) => {
     if (!token) return;
     try {
-      const res = await fetch(`/api/claims/${claimId}`, {
+      await apiFetch(`/api/claims/${claimId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -152,9 +141,7 @@ export const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ id, onNavigate, 
           finder_notes: notes || `Finder marked claim as ${newStatus}`,
         }),
       });
-      if (res.ok) {
-        fetchClaimsForOwner();
-      }
+      fetchClaimsForOwner();
     } catch (e) {
       console.error(e);
     }

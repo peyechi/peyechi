@@ -16,6 +16,7 @@ import { CATEGORIES, DISTRICTS } from '../data/bangladeshData.ts';
 import { ItemCard, ItemCardData } from '../components/ItemCard.tsx';
 import { AntiScamNotice } from '../components/AntiScamNotice.tsx';
 import { CategoryIcon } from '../components/CategoryIcon.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface HomePageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -35,17 +36,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch real statistics
-    fetch('/api/stats')
-      .then((res) => res.json())
+    // Fetch real statistics safely
+    apiFetch('/api/stats')
       .then((data) => {
         setStats(data);
       })
       .catch((err) => console.error('Failed to load stats:', err));
 
-    // Fetch recently approved posts
-    fetch('/api/posts?limit=6')
-      .then((res) => res.json())
+    // Fetch recently approved posts safely
+    apiFetch('/api/posts?limit=6')
       .then((data) => {
         setRecentPosts(data.posts || []);
       })

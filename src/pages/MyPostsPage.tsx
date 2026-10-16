@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface MyPostsPageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -32,10 +33,9 @@ export const MyPostsPage: React.FC<MyPostsPageProps> = ({ onNavigate, onOpenAuth
   const fetchMyPosts = () => {
     if (!token) return;
     setLoading(true);
-    fetch('/api/my-posts', {
+    apiFetch('/api/my-posts', {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts || []);
       })
@@ -54,13 +54,11 @@ export const MyPostsPage: React.FC<MyPostsPageProps> = ({ onNavigate, onOpenAuth
   const handleDeletePost = async (postId: string) => {
     if (!confirm(language === 'bn' ? 'বিজ্ঞপ্তিটি মুছে ফেলতে চান?' : 'Delete this post?')) return;
     try {
-      const res = await fetch(`/api/posts/${postId}`, {
+      await apiFetch(`/api/posts/${postId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        setPosts(posts.filter((p) => p.id !== postId));
-      }
+      setPosts(posts.filter((p) => p.id !== postId));
     } catch (e) {
       console.error(e);
     }
@@ -68,7 +66,7 @@ export const MyPostsPage: React.FC<MyPostsPageProps> = ({ onNavigate, onOpenAuth
 
   const handleResolvePost = async (postId: string) => {
     try {
-      const res = await fetch(`/api/posts/${postId}/resolve`, {
+      await apiFetch(`/api/posts/${postId}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,9 +74,7 @@ export const MyPostsPage: React.FC<MyPostsPageProps> = ({ onNavigate, onOpenAuth
         },
         body: JSON.stringify({ reason: 'Resolved by author' }),
       });
-      if (res.ok) {
-        fetchMyPosts();
-      }
+      fetchMyPosts();
     } catch (e) {
       console.error(e);
     }

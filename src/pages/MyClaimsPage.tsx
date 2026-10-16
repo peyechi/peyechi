@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { apiFetch } from '../lib/apiClient.ts';
 
 interface MyClaimsPageProps {
   onNavigate: (page: string, params?: any) => void;
@@ -28,10 +29,9 @@ export const MyClaimsPage: React.FC<MyClaimsPageProps> = ({ onNavigate, onOpenAu
       setLoading(false);
       return;
     }
-    fetch('/api/my-claims', {
+    apiFetch('/api/my-claims', {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
       .then((data) => {
         setClaims(data.claims || []);
       })

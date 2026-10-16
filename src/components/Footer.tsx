@@ -1,6 +1,7 @@
 import React from 'react';
-import { ShieldCheck, PhoneCall, Heart } from 'lucide-react';
+import { ShieldCheck, PhoneCall, Heart, Lock } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { PeyechiLogo } from './PeyechiLogo.tsx';
 
 interface FooterProps {
   onNavigate: (page: string) => void;
@@ -15,13 +16,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Col 1: About */}
           <div className="md:col-span-1 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
-                BD
-              </div>
-              <span className="text-white font-bold text-base tracking-tight">
-                {language === 'bn' ? 'হারানো ও প্রাপ্তি বাংলাদেশ' : 'Lost & Found BD'}
-              </span>
+            <div className="cursor-pointer" onClick={() => onNavigate('home')}>
+              <PeyechiLogo variant="header" theme="dark" showTagline={true} />
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
               {language === 'bn'
@@ -74,6 +70,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   className="hover:text-emerald-400 transition-colors"
                 >
                   {language === 'bn' ? 'নিরাপত্তা ও প্রতারণা রোধ গাইড' : 'Safety & Anti-Fraud Guide'}
+                </button>
+              </li>
+              <li className="pt-1">
+                <button
+                  onClick={() => onNavigate('admin')}
+                  className="text-amber-400 hover:text-amber-300 font-bold transition-colors flex items-center gap-1.5"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{language === 'bn' ? 'মডারেটর ও অ্যাডমিন পোর্টাল' : 'Moderator / Admin Portal'}</span>
                 </button>
               </li>
             </ul>

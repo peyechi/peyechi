@@ -16,6 +16,7 @@ import { CATEGORIES, DISTRICTS } from '../data/bangladeshData.ts';
 import { ItemCard, ItemCardData } from '../components/ItemCard.tsx';
 import { AntiScamNotice } from '../components/AntiScamNotice.tsx';
 import { CategoryIcon } from '../components/CategoryIcon.tsx';
+import { PeyechiLogo } from '../components/PeyechiLogo.tsx';
 import { apiFetch } from '../lib/apiClient.ts';
 
 interface HomePageProps {
@@ -83,21 +84,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-semibold backdrop-blur-xs">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
             <span>
               {language === 'bn'
-                ? 'বাংলাদেশের নির্ভরযোগ্য ডিজিটাল হারানো ও প্রাপ্তি রেজিস্ট্রি'
-                : 'Bangladesh’s Trusted Citizen Lost & Found Network'}
+                ? 'পেয়েছি — নিরাপদ ও গোপনীয়তাপ্রধান সিটিজেন রেজিস্ট্রি'
+                : 'Peyechi — Citizen Lost & Found Platform'}
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            {t.siteTitle}
-          </h1>
+          <div className="py-2">
+            <PeyechiLogo variant="hero" theme="dark" showTagline={true} />
+          </div>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            {t.taglineSubtitle}
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            {language === 'bn'
+              ? 'নিরাপদে হারানো জিনিস রিপোর্ট করুন, পাওয়া জিনিস খুঁজে মালিকের কাছে পৌঁছে দিন। কোনো প্রকাশ্য ফোন নম্বর নেই, পূর্ণ গোপনীয়তা রক্ষা।'
+              : 'Safely report lost items or submit found belongings. Zero public phone numbers and strict verification privacy.'}
           </p>
 
           {/* Search Box */}

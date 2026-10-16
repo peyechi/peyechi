@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="favBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#04563a" />
+      <stop offset="100%" stop-color="#023824" />
+    </linearGradient>
+    <linearGradient id="favPin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded App Tile -->
+  <rect width="64" height="64" rx="16" fill="url(#favBg)" />
+
+  <!-- 3 Golden Yellow Sparkle Rays -->
+  <g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round">
+    <line x1="43" y1="16" x2="48" y2="10" />
+    <line x1="50" y1="21" x2="57" y2="17" />
+    <line x1="51" y1="28" x2="57" y2="28" />
+  </g>
+  <circle cx="47" cy="19" r="1.5" fill="#fde68a" />
+
+  <!-- Map Pin Marker -->
+  <g transform="translate(14, 15)">
+    <path 
+      d="M18 2 C10.82 2 5 7.82 5 15 C5 24.5 18 36 18 36 C18 36 31 24.5 31 15 C31 7.82 25.18 2 18 2 Z" 
+      fill="url(#favPin)" 
+      stroke="#ffffff" 
+      stroke-width="2" 
+    />
+    <circle cx="18" cy="14" r="5" fill="#ffffff" />
+    <circle cx="18" cy="14" r="2.5" fill="#04563a" />
+  </g>
+</svg>

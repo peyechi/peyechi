@@ -56,6 +56,26 @@ function MainApp() {
     return () => window.removeEventListener('popstate', parseUrl);
   }, []);
 
+  // Sync dynamic SEO document titles
+  useEffect(() => {
+    const seoTitles: Record<string, string> = {
+      home: 'পেয়েছি (Peyechi) – হারানো জিনিস ফিরে আসুক আপন ঠিকানায় | Lost & Found Bangladesh',
+      explore: 'বিজ্ঞপ্তি অনুসন্ধান – হারিয়ে যাওয়া বা পাওয়া জিনিস খুঁজুন | পেয়েছি (Peyechi)',
+      'report-lost': 'হারানো জিনিসের বিবরণ দিন – দ্রুত ও নিরাপদে রিপোর্ট করুন | পেয়েছি (Peyechi)',
+      'report-found': 'পাওয়া জিনিসের রিপোর্ট করুন – প্রকৃত মালিকের কাছে পৌঁছে দিন | পেয়েছি (Peyechi)',
+      item: 'বিজ্ঞপ্তির বিস্তারিত তথ্য ও মালিকানা যাচাই | পেয়েছি (Peyechi)',
+      'my-posts': 'আমার রিপোর্টকৃত বিজ্ঞপ্তিসমূহ | পেয়েছি (Peyechi)',
+      'my-claims': 'আমার জমাকৃত মালিকানা দাবিসমূহ | পেয়েছি (Peyechi)',
+      admin: 'মডারেটর ও অ্যাডমিন পোর্টাল – সিকিউর মডারেশন ইঞ্জিন | পেয়েছি (Peyechi)',
+      safety: 'নিরাপত্তা ও প্রতারণা রোধ গাইডলাইন – সতর্ক থাকুন | পেয়েছি (Peyechi)',
+      privacy: 'গোপনীয়তা নীতি ও সিটিজেন ডেটা সুরক্ষা | পেয়েছি (Peyechi)',
+      terms: 'ব্যবহারের সাধারণ নিয়মাবলী ও শর্তাবলী | পেয়েছি (Peyechi)',
+    };
+    if (seoTitles[currentPage]) {
+      document.title = seoTitles[currentPage];
+    }
+  }, [currentPage]);
+
   const navigateTo = (page: string, params: any = {}) => {
     setCurrentPage(page);
     setPageParams(params);

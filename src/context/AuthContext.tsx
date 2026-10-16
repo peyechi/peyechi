@@ -8,6 +8,7 @@ export interface User {
   role: 'USER' | 'MODERATOR' | 'ADMIN';
   status: 'ACTIVE' | 'SUSPENDED';
   preferred_language: 'bn' | 'en';
+  email_verified?: boolean;
 }
 
 interface AuthContextType {
@@ -16,6 +17,12 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, displayName: string, lang?: string) => Promise<{ success: boolean; error?: string }>;
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; code?: string; error?: string }>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
+  requestEmailOtp: (email: string) => Promise<{ success: boolean; otp?: string; error?: string }>;
+  loginWithOtp: (email: string, otp: string) => Promise<{ success: boolean; error?: string }>;
+  verifyEmailAddress: () => Promise<{ success: boolean; error?: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   refreshUser: () => Promise<void>;
@@ -89,6 +96,97 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    try {
+      const data = await apiFetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      return { success: true, code: data.code };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to request reset' };
+    }
+  };
+
+  const resetPassword = async (email: string, code: string, newPassword: string) => {
+    try {
+      await apiFetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, new_password: newPassword }),
+      });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to reset password' };
+    }
+  };
+
+  const requestEmailOtp = async (email: string) => {
+    try {
+      const data = await apiFetch('/api/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      return { success: true, otp: data.otp };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to send OTP' };
+    }
+  };
+
+  const loginWithOtp = async (email: string, otp: string) => {
+    try {
+      const data = await apiFetch('/api/auth/login-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+      localStorage.setItem('lf_token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'OTP login failed' };
+    }
+  };
+
+  const verifyEmailAddress = async () => {
+    if (!token) return { success: false, error: 'Not authenticated' };
+    try {
+      const data = await apiFetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (user) {
+        setUser({ ...user, email_verified: true });
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    if (!token) return { success: false, error: 'Not authenticated' };
+    try {
+      await apiFetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to change password' };
+    }
+  };
+
   const logout = async () => {
     if (token) {
       try {
@@ -108,14 +206,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteAccount = async () => {
     if (!token) return { success: false, error: 'Not authenticated' };
     try {
-      const res = await fetch('/api/auth/delete-account', {
+      await apiFetch('/api/auth/delete-account', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Failed to delete account' };
-      }
       await logout();
       return { success: true };
     } catch (err: any) {
@@ -137,6 +231,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         register,
+        requestPasswordReset,
+        resetPassword,
+        requestEmailOtp,
+        loginWithOtp,
+        verifyEmailAddress,
+        changePassword,
         logout,
         deleteAccount,
         refreshUser,

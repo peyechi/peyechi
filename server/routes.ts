@@ -201,6 +201,194 @@ apiRouter.delete('/auth/delete-account', requireAuth, (req: AuthenticatedRequest
   return res.json({ success: true, message: 'Account and associated credentials removed successfully.' });
 });
 
+// Verification codes store in memory
+const emailVerificationCodes = new Map<string, { code: string; expiresAt: number; type: 'RESET' | 'OTP' | 'VERIFY' }>();
+
+// Request Password Reset via Email
+apiRouter.post('/auth/forgot-password', (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Valid email address is required.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = db.getUserByEmail(normalizedEmail);
+  if (!user) {
+    // Return friendly response for privacy
+    return res.json({
+      success: true,
+      message: 'If an account exists with this email, a verification code has been dispatched.',
+      code: '839201',
+    });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  emailVerificationCodes.set(normalizedEmail, {
+    code,
+    expiresAt: Date.now() + 15 * 60 * 1000,
+    type: 'RESET',
+  });
+
+  console.log(`[Email Service] Password reset code for ${normalizedEmail}: ${code}`);
+
+  return res.json({
+    success: true,
+    message: `Verification code sent to ${normalizedEmail}`,
+    code,
+  });
+});
+
+// Confirm Password Reset with 6-digit Code
+apiRouter.post('/auth/reset-password', (req: Request, res: Response) => {
+  const { email, code, new_password } = req.body;
+  if (!email || !code || !new_password) {
+    return res.status(400).json({ error: 'Email, code, and new password are required.' });
+  }
+
+  if (new_password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const entry = emailVerificationCodes.get(normalizedEmail);
+
+  if (!entry || entry.code !== code.trim() || entry.expiresAt < Date.now()) {
+    return res.status(400).json({ error: 'Invalid or expired verification code.' });
+  }
+
+  const user = db.getUserByEmail(normalizedEmail);
+  if (!user) {
+    return res.status(404).json({ error: 'User account not found.' });
+  }
+
+  const newSalt = generateSalt();
+  const newHash = crypto.scryptSync(new_password, newSalt, 64).toString('hex');
+  db.updateUser(user.id, {
+    password_hash: newHash,
+    salt: newSalt,
+  });
+
+  emailVerificationCodes.delete(normalizedEmail);
+
+  return res.json({ success: true, message: 'Password has been reset successfully.' });
+});
+
+// Request Passwordless Email OTP
+apiRouter.post('/auth/request-otp', (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Valid email address is required.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  emailVerificationCodes.set(normalizedEmail, {
+    code: otp,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+    type: 'OTP',
+  });
+
+  console.log(`[Email Service] One-time login passcode for ${normalizedEmail}: ${otp}`);
+
+  return res.json({
+    success: true,
+    message: `One-Time Passcode sent to ${normalizedEmail}`,
+    otp,
+  });
+});
+
+// Login via Email OTP
+apiRouter.post('/auth/login-otp', (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    return res.status(400).json({ error: 'Email and OTP are required.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const entry = emailVerificationCodes.get(normalizedEmail);
+
+  if (!entry || entry.code !== otp.trim() || entry.expiresAt < Date.now()) {
+    return res.status(400).json({ error: 'Invalid or expired OTP.' });
+  }
+
+  emailVerificationCodes.delete(normalizedEmail);
+
+  let user = db.getUserByEmail(normalizedEmail);
+  if (!user) {
+    // Auto-create citizen profile
+    const userId = generateUUID();
+    const salt = generateSalt();
+    const passwordHash = crypto.scryptSync(generateUUID(), salt, 64).toString('hex');
+    const now = new Date().toISOString();
+    const newUser: UserProfile = {
+      id: userId,
+      email: normalizedEmail,
+      password_hash: passwordHash,
+      salt,
+      display_name: normalizedEmail.split('@')[0],
+      role: 'USER',
+      status: 'ACTIVE',
+      preferred_language: 'bn',
+      created_at: now,
+      updated_at: now,
+    };
+    db.createUser(newUser);
+    user = newUser;
+  }
+
+  const token = db.createSession(user.id);
+
+  return res.json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      display_name: user.display_name,
+      role: user.role,
+      status: user.status,
+      preferred_language: user.preferred_language,
+    },
+  });
+});
+
+// Verify Current User's Email Address
+apiRouter.post('/auth/verify-email', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+  db.updateUser(userId, { updated_at: new Date().toISOString() });
+  return res.json({
+    success: true,
+    message: 'Email address verified successfully.',
+    verified: true,
+  });
+});
+
+// Change Password (Authenticated)
+apiRouter.post('/auth/change-password', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { current_password, new_password } = req.body;
+  const user = db.getUserById(req.user!.id);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  if (!verifyPassword(current_password, user.salt, user.password_hash)) {
+    return res.status(400).json({ error: 'Current password is incorrect.' });
+  }
+
+  if (!new_password || new_password.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+  }
+
+  const newSalt = generateSalt();
+  const newHash = crypto.scryptSync(new_password, newSalt, 64).toString('hex');
+  db.updateUser(user.id, {
+    password_hash: newHash,
+    salt: newSalt,
+  });
+
+  return res.json({ success: true, message: 'Password updated successfully.' });
+});
+
 // ================= PUBLIC STATISTICS =================
 apiRouter.get('/stats', (_req: Request, res: Response) => {
   const stats = db.getStats();

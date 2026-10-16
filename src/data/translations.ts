@@ -2,9 +2,11 @@ export type Language = 'bn' | 'en';
 
 export const translations = {
   bn: {
-    siteTitle: 'হারানো ও প্রাপ্তি বাংলাদেশ',
-    siteTagline: 'নিরাপদ, বিশ্বস্ত এবং গোপনীয়তা সুরক্ষায় পরিচালিত হারানো-প্রাপ্তি সেবা',
-    taglineSubtitle: 'আপনার হারিয়ে যাওয়া জিনিস খুঁজে পেতে কিংবা পাওয়া জিনিস প্রকৃত মালিকের কাছে ফেরত দিতে সাহায্য করুন।',
+    siteBrand: 'পেয়েছি',
+    siteMotto: 'হারানো জিনিস ফিরে আসুক আপন ঠিকানায়।',
+    siteTitle: 'পেয়েছি (Peyechi)',
+    siteTagline: 'হারানো জিনিস ফিরে আসুক আপন ঠিকানায়।',
+    taglineSubtitle: 'হারানো জিনিস ফিরে আসুক আপন ঠিকানায়। আপনার হারিয়ে যাওয়া জিনিস খুঁজে পেতে কিংবা পাওয়া জিনিস প্রকৃত মালিকের কাছে ফেরত দিতে সাহায্য করুন।',
     switchLang: 'English',
     antiScamNoticeTitle: 'সতর্কতা ও নিরাপত্তা বার্তা',
     antiScamNoticeText: 'সতর্কতা: জিনিস ফেরত পাওয়ার জন্য অগ্রিম বিকাশ, নগদ, কুরিয়ার বা অন্য কোনো ফি দেবেন না। ব্যক্তিগত তথ্য ও OTP শেয়ার করবেন না। নিরাপদ ও জনসমাগমপূর্ণ স্থানে জিনিস হস্তান্তর করুন।',
@@ -142,9 +144,11 @@ export const translations = {
     adminAuditLogs: 'মডারেশন লগ রেকর্ড',
   },
   en: {
-    siteTitle: 'Lost & Found Bangladesh',
-    siteTagline: 'Secure, Privacy-First Lost & Found Platform for Bangladesh',
-    taglineSubtitle: 'Safely report lost belongings, find reported items, and reconnect owners with their possessions without fraud.',
+    siteBrand: 'Peyechi',
+    siteMotto: 'Reconnecting Lost Belongings to Their True Owners.',
+    siteTitle: 'Peyechi (পেয়েছি) – Lost & Found BD',
+    siteTagline: 'Reconnecting Lost Belongings to Their Rightful Owners',
+    taglineSubtitle: 'Reconnecting lost belongings with their owners safely. Privacy-first, zero public phone numbers, and transparent citizen verification.',
     switchLang: 'বাংলা',
     antiScamNoticeTitle: 'Anti-Scam & Safety Warning',
     antiScamNoticeText: 'Warning: Never pay advance bKash, Nagad, courier fees, or processing charges to recover items. Never disclose OTPs or private credentials. Always meet in safe, public places for handover.',

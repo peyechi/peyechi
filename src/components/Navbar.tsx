@@ -16,6 +16,8 @@ import {
 import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 
+import { PeyechiLogo } from './PeyechiLogo.tsx';
+
 interface NavbarProps {
   onNavigate: (page: string, params?: any) => void;
   currentPage: string;
@@ -38,26 +40,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, onOpenA
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-      {/* Top micro-bar: Safe Bangladesh lost-and-found notice & language switcher */}
-      <div className="bg-slate-900 text-white text-xs py-1.5 px-4 sm:px-6">
+      {/* Top micro-bar: Brand slogan & quick access */}
+      <div className="bg-emerald-950 text-white text-xs py-1.5 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 truncate">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="truncate text-slate-300">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span className="truncate text-emerald-200 font-medium">
               {language === 'bn'
-                ? 'গণপ্রজাতন্ত্রী বাংলাদেশ — নিরাপদ ও গোপনীয়তাপ্রধান হারানো ও প্রাপ্তি প্ল্যাটফর্ম'
-                : 'Bangladesh Privacy-First Citizen Lost & Found Registry'}
+                ? 'পেয়েছি — হারানো জিনিস ফিরে আসুক আপন ঠিকানায়।'
+                : 'Peyechi — Reconnecting lost belongings with their rightful owners.'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Quick Admin Access Button for review / testing */}
+            <button
+              onClick={() => handleNav('admin')}
+              className="flex items-center gap-1 text-3xs sm:text-2xs bg-emerald-900 hover:bg-emerald-800 text-amber-300 font-bold px-2 py-0.5 rounded-md border border-emerald-700/80 transition-colors cursor-pointer"
+              title="Admin Portal"
+            >
+              <Lock className="w-3 h-3 text-amber-400" />
+              <span>{language === 'bn' ? 'অ্যাডমিন অ্যাক্সেস' : 'Admin'}</span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-full border border-slate-700 transition-colors"
+              className="flex items-center gap-1.5 text-xs bg-emerald-900 hover:bg-emerald-800 text-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-700 transition-colors"
               title="Change Language"
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <Globe className="w-3.5 h-3.5 text-amber-400" />
               <span className="font-semibold">{language === 'bn' ? 'English' : 'বাংলা'}</span>
             </button>
           </div>
@@ -66,28 +78,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, onOpenA
 
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+        <div className="flex items-center justify-between h-18">
+          {/* Logo with Peyechi typography & map pin & sparkles */}
           <div
             onClick={() => handleNav('home')}
-            className="flex items-center gap-2.5 cursor-pointer group"
+            className="flex items-center gap-3 cursor-pointer group py-1"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-700 to-teal-500 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-              <Search className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight leading-tight">
-                  {language === 'bn' ? 'হারানো ও প্রাপ্তি' : 'Lost & Found'}
-                </span>
-                <span className="bg-emerald-100 text-emerald-800 text-2xs font-bold px-1.5 py-0.5 rounded-sm">
-                  BD
-                </span>
-              </div>
-              <p className="text-2xs text-slate-500 font-medium">
-                {language === 'bn' ? 'বাংলাদেশ সিটিজেন পোর্টাল' : 'Bangladesh Citizen Portal'}
-              </p>
-            </div>
+            <PeyechiLogo variant="full" showTagline={true} />
           </div>
 
           {/* Desktop Nav Items */}
@@ -96,11 +93,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, onOpenA
               onClick={() => handleNav('explore')}
               className={`px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors ${
                 currentPage === 'explore'
-                  ? 'bg-slate-100 text-emerald-800'
+                  ? 'bg-emerald-50 text-emerald-800'
                   : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <Compass className="w-4 h-4 text-slate-500" />
+              <Compass className="w-4 h-4 text-emerald-700" />
               <span>{t.navExplore}</span>
             </button>
 
@@ -140,19 +137,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, onOpenA
               <span>{t.navSafety}</span>
             </button>
 
-            {isAdmin && (
-              <button
-                onClick={() => handleNav('admin')}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors ${
-                  currentPage.startsWith('admin')
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'text-purple-700 hover:bg-purple-50'
-                }`}
-              >
-                <Lock className="w-4 h-4 text-purple-600" />
-                <span>{t.navAdmin}</span>
-              </button>
-            )}
+            {/* Direct Admin Access Button */}
+            <button
+              onClick={() => handleNav('admin')}
+              className={`px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-colors ${
+                currentPage.startsWith('admin')
+                  ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                  : 'text-purple-700 hover:bg-purple-50'
+              }`}
+            >
+              <Lock className="w-4 h-4 text-purple-600" />
+              <span>{language === 'bn' ? 'অ্যাডমিন প্যানেল' : 'Admin'}</span>
+            </button>
           </nav>
 
           {/* User Auth Section */}
@@ -279,6 +275,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, onOpenA
           >
             <Shield className="w-4 h-4 text-slate-500" />
             <span>{t.navSafety}</span>
+          </button>
+
+          <button
+            onClick={() => handleNav('admin')}
+            className="w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-purple-700 bg-purple-50 flex items-center gap-2"
+          >
+            <Lock className="w-4 h-4 text-purple-600" />
+            <span>{language === 'bn' ? 'অ্যাডমিন পোর্টাল' : 'Admin Portal'}</span>
           </button>
 
           {user && (

@@ -1,6 +1,6 @@
 {
-  "name": "Lost & Found Bangladesh | হারানো ও প্রাপ্তি বাংলাদেশ",
-  "description": "A secure, privacy-first bilingual lost and found platform for Bangladesh. Report lost and found items, submit private claims, and safely reconnect with belongings.",
+  "name": "পেয়েছি (Peyechi) – হারানো জিনিস ফিরে আসুক আপন ঠিকানায়",
+  "description": "পেয়েছি (Peyechi) বাংলাদেশের প্রথম নিরাপদ ও গোপনীয়তা-সুরক্ষিত ডিজিটাল হারানো ও প্রাপ্তি রেজিস্ট্রি। হারানো জিনিস রিপোর্ট করুন, খুঁজুন এবং নিরাপদে ফেরত পান।",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

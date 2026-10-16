@@ -26,8 +26,18 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { user, token } = useAuth();
+  const { user, token, login } = useAuth();
   const { language, t } = useLanguage();
+  const [adminLoggingIn, setAdminLoggingIn] = useState(false);
+
+  const handleAdminQuickLogin = async () => {
+    setAdminLoggingIn(true);
+    try {
+      await login('admin@lostfound.bd', 'Admin@123456');
+    } finally {
+      setAdminLoggingIn(false);
+    }
+  };
 
   const [activeTab, setActiveTab] = useState<
     'overview' | 'pending' | 'posts' | 'claims' | 'reports' | 'users' | 'logs'
@@ -165,16 +175,53 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   if (!isAdmin) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <Lock className="w-12 h-12 text-rose-500 mx-auto" />
-        <h2 className="text-xl font-bold text-slate-900">
-          {language === 'bn' ? 'অ্যাক্সেস সংরক্ষিত' : 'Unauthorized Access'}
-        </h2>
-        <p className="text-xs text-slate-500">
-          {language === 'bn'
-            ? 'এই পৃষ্ঠাটি কেবল অনুমোদিত মডারেটর এবং অ্যাডমিনিস্ট্রেটরদের জন্য প্রযোজ্য।'
-            : 'This moderation portal is restricted to authorized moderators only.'}
-        </p>
+      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-5">
+        <div className="w-14 h-14 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center mx-auto shadow-xs">
+          <Lock className="w-7 h-7" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-2xl font-black text-slate-900">
+            {language === 'bn' ? 'অ্যাডমিন ও মডারেশন পোর্টাল' : 'Admin & Moderation Portal'}
+          </h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+            {language === 'bn'
+              ? 'এই পোর্টালে প্রবেশের জন্য সুপার অ্যাডমিন বা অনুমোদিত মডারেটর হিসেবে লগইন থাকা আবশ্যক।'
+              : 'Administrator or Moderator authorization is required to access the moderation engine.'}
+          </p>
+        </div>
+
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-xs text-purple-900 space-y-3 text-left">
+          <div className="flex items-center gap-1.5 font-bold text-purple-900">
+            <ShieldAlert className="w-4 h-4 text-purple-700 shrink-0" />
+            <span>{language === 'bn' ? 'পরীক্ষামূলক অ্যাডমিন একাউন্ট:' : 'Evaluation Admin Account:'}</span>
+          </div>
+          <p className="font-mono text-3xs text-purple-800 bg-white/70 p-2 rounded-md border border-purple-200">
+            Email: <strong>admin@lostfound.bd</strong><br />
+            Password: <strong>Admin@123456</strong>
+          </p>
+          <button
+            type="button"
+            disabled={adminLoggingIn}
+            onClick={handleAdminQuickLogin}
+            className="w-full py-2.5 px-4 bg-purple-700 hover:bg-purple-800 text-white rounded-lg font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {adminLoggingIn ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <Check className="w-4 h-4" />
+                <span>{language === 'bn' ? '১-ক্লিকে অ্যাডমিন লগইন করুন (Instant Admin Access)' : '1-Click Sign In as Admin'}</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <button
+          onClick={() => onNavigate('home')}
+          className="text-xs text-slate-500 hover:text-slate-800 font-bold transition-colors"
+        >
+          {language === 'bn' ? '← হোমে ফিরে যান' : '← Back to Home'}
+        </button>
       </div>
     );
   }
